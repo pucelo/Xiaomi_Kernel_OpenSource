@@ -88,7 +88,10 @@
 		(x)->i_mode = ((x)->i_mode & S_IFMT) | 0775;\
 	} while (0)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 /* Android 5.0 support */
 
 /* Permission mode for a specific node. Controls how file permissions
@@ -632,7 +635,11 @@ static inline bool str_n_case_eq(const char *s1, const char *s2, size_t len)
 
 static inline bool qstr_case_eq(const struct qstr *q1, const struct qstr *q2)
 {
+<<<<<<< HEAD
 	return q1->len == q2->len && str_n_case_eq(q1->name, q2->name, q1->len);
+=======
+	return q1->len == q2->len && str_n_case_eq(q1->name, q2->name, q2->len);
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 }
 
 #define QSTR_LITERAL(string) QSTR_INIT(string, sizeof(string)-1)

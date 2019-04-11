@@ -505,6 +505,12 @@ struct binder_priority {
  *                        (invariant after initialized)
  * @tsk                   task_struct for group_leader of process
  *                        (invariant after initialized)
+<<<<<<< HEAD
+=======
+ * @files                 files_struct for process
+ *                        (protected by @files_lock)
+ * @files_lock            mutex to protect @files
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
  * @deferred_work_node:   element for binder_deferred_list
  *                        (protected by binder_deferred_lock)
  * @deferred_work:        bitmap of deferred work to perform
@@ -551,6 +557,11 @@ struct binder_proc {
 	struct list_head waiting_threads;
 	int pid;
 	struct task_struct *tsk;
+<<<<<<< HEAD
+=======
+	struct files_struct *files;
+	struct mutex files_lock;
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	struct hlist_node deferred_work_node;
 	int deferred_work;
 	bool is_dead;
@@ -953,19 +964,31 @@ struct files_struct *binder_get_files_struct(struct binder_proc *proc)
 
 static int task_get_unused_fd_flags(struct binder_proc *proc, int flags)
 {
+<<<<<<< HEAD
 	struct files_struct *files;
+=======
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	unsigned long rlim_cur;
 	unsigned long irqs;
 	int ret;
 
+<<<<<<< HEAD
 	files = binder_get_files_struct(proc);
 	if (files == NULL)
 		return -ESRCH;
 
+=======
+	mutex_lock(&proc->files_lock);
+	if (proc->files == NULL) {
+		ret = -ESRCH;
+		goto err;
+	}
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	if (!lock_task_sighand(proc->tsk, &irqs)) {
 		ret = -EMFILE;
 		goto err;
 	}
+<<<<<<< HEAD
 
 	rlim_cur = task_rlimit(proc->tsk, RLIMIT_NOFILE);
 	unlock_task_sighand(proc->tsk, &irqs);
@@ -973,6 +996,14 @@ static int task_get_unused_fd_flags(struct binder_proc *proc, int flags)
 	ret = __alloc_fd(files, 0, rlim_cur, flags);
 err:
 	put_files_struct(files);
+=======
+	rlim_cur = task_rlimit(proc->tsk, RLIMIT_NOFILE);
+	unlock_task_sighand(proc->tsk, &irqs);
+
+	ret = __alloc_fd(proc->files, 0, rlim_cur, flags);
+err:
+	mutex_unlock(&proc->files_lock);
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	return ret;
 }
 
@@ -982,12 +1013,19 @@ err:
 static void task_fd_install(
 	struct binder_proc *proc, unsigned int fd, struct file *file)
 {
+<<<<<<< HEAD
 	struct files_struct *files = binder_get_files_struct(proc);
 
 	if (files) {
 		__fd_install(files, fd, file);
 		put_files_struct(files);
 	}
+=======
+	mutex_lock(&proc->files_lock);
+	if (proc->files)
+		__fd_install(proc->files, fd, file);
+	mutex_unlock(&proc->files_lock);
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 }
 
 /*
@@ -998,18 +1036,32 @@ static long task_close_fd(struct binder_proc *proc, unsigned int fd)
 	struct files_struct *files = binder_get_files_struct(proc);
 	int retval;
 
+<<<<<<< HEAD
 	if (files == NULL)
 		return -ESRCH;
 
 	retval = __close_fd(files, fd);
+=======
+	mutex_lock(&proc->files_lock);
+	if (proc->files == NULL) {
+		retval = -ESRCH;
+		goto err;
+	}
+	retval = __close_fd(proc->files, fd);
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	/* can't restart close syscall because file table entry was cleared */
 	if (unlikely(retval == -ERESTARTSYS ||
 		     retval == -ERESTARTNOINTR ||
 		     retval == -ERESTARTNOHAND ||
 		     retval == -ERESTART_RESTARTBLOCK))
 		retval = -EINTR;
+<<<<<<< HEAD
 	put_files_struct(files);
 
+=======
+err:
+	mutex_unlock(&proc->files_lock);
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	return retval;
 }
 
@@ -4874,8 +4926,17 @@ static int binder_mmap(struct file *filp, struct vm_area_struct *vma)
 	vma->vm_private_data = proc;
 
 	ret = binder_alloc_mmap_handler(&proc->alloc, vma);
+<<<<<<< HEAD
 
 	return ret;
+=======
+	if (ret)
+		return ret;
+	mutex_lock(&proc->files_lock);
+	proc->files = get_files_struct(current);
+	mutex_unlock(&proc->files_lock);
+	return 0;
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
 err_bad_arg:
 	pr_err("binder_mmap: %d %lx-%lx %s failed %d\n",
@@ -4898,6 +4959,7 @@ static int binder_open(struct inode *nodp, struct file *filp)
 	spin_lock_init(&proc->outer_lock);
 	get_task_struct(current->group_leader);
 	proc->tsk = current->group_leader;
+	mutex_init(&proc->files_lock);
 	INIT_LIST_HEAD(&proc->todo);
 	if (binder_supported_policy(current->policy)) {
 		proc->default_priority.sched_policy = current->policy;
@@ -5151,6 +5213,18 @@ static void binder_deferred_func(struct work_struct *work)
 		}
 		mutex_unlock(&binder_deferred_lock);
 
+<<<<<<< HEAD
+=======
+		files = NULL;
+		if (defer & BINDER_DEFERRED_PUT_FILES) {
+			mutex_lock(&proc->files_lock);
+			files = proc->files;
+			if (files)
+				proc->files = NULL;
+			mutex_unlock(&proc->files_lock);
+		}
+
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 		if (defer & BINDER_DEFERRED_FLUSH)
 			binder_deferred_flush(proc);
 

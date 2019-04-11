@@ -466,10 +466,23 @@ static struct key *construct_key_and_link(struct keyring_search_context *ctx,
 
 	if (ctx->index_key.type == &key_type_keyring)
 		return ERR_PTR(-EPERM);
+<<<<<<< HEAD
 	
 	ret = construct_get_dest_keyring(&dest_keyring);
 	if (ret)
 		goto error;
+=======
+
+	ret = construct_get_dest_keyring(&dest_keyring);
+	if (ret)
+		goto error;
+
+	user = key_user_lookup(current_fsuid());
+	if (!user) {
+		ret = -ENOMEM;
+		goto error_put_dest_keyring;
+	}
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
 	user = key_user_lookup(current_fsuid());
 	if (!user) {

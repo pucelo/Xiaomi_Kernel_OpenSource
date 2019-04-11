@@ -232,6 +232,10 @@ static void parse_hid_report_descriptor(struct gtco *device, char * report,
 	/* Walk  this report and pull out the info we need */
 	while (i < length) {
 		prefix = report[i++];
+<<<<<<< HEAD
+=======
+
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 		/* Determine data size and save the data in the proper variable */
 		size = (1U << PREF_SIZE(prefix)) >> 1;
 		if (i + size > length) {

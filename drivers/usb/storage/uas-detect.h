@@ -61,7 +61,10 @@ static int uas_use_uas_driver(struct usb_interface *intf,
 	unsigned long flags = id->driver_info;
 	struct usb_host_interface *alt;
 	int r;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
 	alt = uas_find_uas_alt_setting(intf);
 	if (!alt)

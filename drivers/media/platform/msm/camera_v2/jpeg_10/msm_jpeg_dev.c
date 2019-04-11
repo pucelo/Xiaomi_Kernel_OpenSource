@@ -1,5 +1,8 @@
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+<<<<<<< HEAD
  * Copyright (C) 2018 XiaoMi, Inc.
+=======
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -34,6 +37,8 @@
 #define DEV_NAME_LEN 10
 static char devname[DEV_NAME_LEN];
 
+
+static char devname[DEV_NAME_LEN];
 
 static int msm_jpeg_open(struct inode *inode, struct file *filp)
 {
@@ -330,6 +335,7 @@ static struct platform_driver msm_jpeg_driver = {
 static int __init msm_jpeg_driver_init(void)
 {
 	int rc;
+
 	rc = platform_driver_register(&msm_jpeg_driver);
 	return rc;
 }

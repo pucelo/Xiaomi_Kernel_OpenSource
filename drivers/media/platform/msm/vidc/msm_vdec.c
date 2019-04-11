@@ -1,5 +1,8 @@
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+<<<<<<< HEAD
  * Copyright (C) 2018 XiaoMi, Inc.
+=======
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1644,6 +1647,8 @@ static int set_max_internal_buffers_size(struct msm_vidc_inst *inst)
 			get_buff_req_buffer(inst, internal_buffers[i].type);
 		internal_buffers[i].size = internal_buffers[i].req ?
 			internal_buffers[i].req->buffer_size : 0;
+		if (internal_buffers[i].req == NULL)
+			continue;
 
 		rc = allocate_and_set_internal_bufs(inst,
 					internal_buffers[i].req,

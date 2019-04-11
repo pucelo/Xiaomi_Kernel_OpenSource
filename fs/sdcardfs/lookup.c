@@ -434,6 +434,10 @@ struct dentry *sdcardfs_lookup(struct inode *dir, struct dentry *dentry,
 		ret = ERR_PTR(-ENOMEM);
 		goto out_err;
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	sdcardfs_get_lower_path(parent, &lower_parent_path);
 
 	/* allocate dentry private data.  We free it in ->d_release */

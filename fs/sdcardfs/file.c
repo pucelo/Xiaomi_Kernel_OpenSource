@@ -128,9 +128,12 @@ static long sdcardfs_unlocked_ioctl(struct file *file, unsigned int cmd,
 	if (!err) {
 		sdcardfs_copy_and_fix_attrs(file_inode(file),
 				      file_inode(lower_file));
+<<<<<<< HEAD
 		fsstack_copy_inode_size(file_inode(file),
 				      file_inode(lower_file));
 	}
+=======
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	revert_fsids(saved_cred);
 out:
 	return err;
@@ -153,6 +156,14 @@ static long sdcardfs_compat_ioctl(struct file *file, unsigned int cmd,
 		goto out;
 
 	/* save current_cred and override it */
+<<<<<<< HEAD
+=======
+	saved_cred = override_fsids(sbi, SDCARDFS_I(file_inode(file))->data);
+	if (!saved_cred) {
+		err = -ENOMEM;
+		goto out;
+	}
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
 	saved_cred = override_fsids(sbi, SDCARDFS_I(file_inode(file))->data);
 	if (!saved_cred) {
@@ -249,6 +260,14 @@ static int sdcardfs_open(struct inode *inode, struct file *file)
 	}
 
 	/* save current_cred and override it */
+<<<<<<< HEAD
+=======
+	saved_cred = override_fsids(sbi, SDCARDFS_I(inode)->data);
+	if (!saved_cred) {
+		err = -ENOMEM;
+		goto out_err;
+	}
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
 	saved_cred = override_fsids(sbi, SDCARDFS_I(inode)->data);
 	if (!saved_cred) {

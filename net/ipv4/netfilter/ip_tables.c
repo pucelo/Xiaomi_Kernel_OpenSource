@@ -409,13 +409,18 @@ ipt_do_table(struct sk_buff *skb,
 			}
 			if (table_base + v != ipt_next_entry(e) &&
 			    !(e->ip.flags & IPT_F_GOTO)) {
+<<<<<<< HEAD
 					if (unlikely(stackidx >= private->stacksize)) {
 						verdict = NF_DROP;
 						break;
 					}
+=======
+				if (unlikely(stackidx >= private->stacksize)) {
+					verdict = NF_DROP;
+					break;
+				}
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 				jumpstack[stackidx++] = e;
-				pr_debug("Pushed %p into pos %u\n",
-					 e, stackidx - 1);
 			}
 
 			e = get_entry(table_base, v);

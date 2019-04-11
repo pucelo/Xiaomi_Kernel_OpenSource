@@ -1552,7 +1552,16 @@ static int fwu_write_f34_v7_command_single_transaction(unsigned char cmd)
 
 	data_base = fwu->f34_fd.data_base_addr;
 
+<<<<<<< HEAD
 	memset(data_1_5.data, 0x00, sizeof(data_1_5.data));
+=======
+		while ((index < MAX_FIRMWARE_ID_LEN - 1) && strptr[index] >= '0'
+						&& strptr[index] <= '9') {
+			firmware_id[index] = strptr[index];
+			index++;
+		}
+		firmware_id[index] = '\0';
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
 	switch (cmd) {
 	case CMD_ERASE_ALL:

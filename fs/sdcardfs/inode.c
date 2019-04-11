@@ -21,6 +21,7 @@
 #include "sdcardfs.h"
 #include <linux/fs_struct.h>
 #include <linux/ratelimit.h>
+#include <linux/sched.h>
 
 const struct cred *override_fsids(struct sdcardfs_sb_info *sbi,
 		struct sdcardfs_inode_data *data)
@@ -76,6 +77,13 @@ static int sdcardfs_create(struct inode *dir, struct dentry *dentry,
 	}
 
 	/* save current_cred and override it */
+<<<<<<< HEAD
+=======
+	saved_cred = override_fsids(SDCARDFS_SB(dir->i_sb),
+					SDCARDFS_I(dir)->data);
+	if (!saved_cred)
+		return -ENOMEM;
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
 	saved_cred = override_fsids(SDCARDFS_SB(dir->i_sb),
 					SDCARDFS_I(dir)->data);
@@ -126,7 +134,10 @@ out_eacces:
 	return err;
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 static int sdcardfs_unlink(struct inode *dir, struct dentry *dentry)
 {
 	int err;
@@ -143,6 +154,13 @@ static int sdcardfs_unlink(struct inode *dir, struct dentry *dentry)
 	}
 
 	/* save current_cred and override it */
+<<<<<<< HEAD
+=======
+	saved_cred = override_fsids(SDCARDFS_SB(dir->i_sb),
+						SDCARDFS_I(dir)->data);
+	if (!saved_cred)
+		return -ENOMEM;
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
 	saved_cred = override_fsids(SDCARDFS_SB(dir->i_sb),
 						SDCARDFS_I(dir)->data);
@@ -306,7 +324,11 @@ static int sdcardfs_mkdir(struct inode *dir, struct dentry *dentry, umode_t mode
 				&& (qstr_case_eq(&dentry->d_name, &q_data)))) {
 		revert_fsids(saved_cred);
 		saved_cred = override_fsids(sbi,
+<<<<<<< HEAD
 					SDCARDFS_I(dentry->d_inode)->data);
+=======
+					SDCARDFS_I(d_inode(dentry))->data);
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 		if (!saved_cred) {
 			pr_err("sdcardfs: failed to set up .nomedia in %s: %d\n",
 						lower_path.dentry->d_name.name,
@@ -326,6 +348,10 @@ out:
 	task_lock(current);
 	current->fs = saved_fs;
 	task_unlock(current);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	free_fs_struct(copied_fs);
 out_unlock:
 	sdcardfs_put_lower_path(dentry, &lower_path);
@@ -716,8 +742,8 @@ out_err:
 	return err;
 }
 
-static int sdcardfs_fillattr(struct vfsmount *mnt,
-				struct inode *inode, struct kstat *stat)
+static int sdcardfs_fillattr(struct vfsmount *mnt, struct inode *inode,
+				struct kstat *lower_stat, struct kstat *stat)
 {
 	struct sdcardfs_inode_info *info = SDCARDFS_I(inode);
 	struct sdcardfs_inode_data *top = top_data_get(info);
@@ -732,12 +758,12 @@ static int sdcardfs_fillattr(struct vfsmount *mnt,
 	stat->uid = make_kuid(&init_user_ns, top->d_uid);
 	stat->gid = make_kgid(&init_user_ns, get_gid(mnt, top));
 	stat->rdev = inode->i_rdev;
-	stat->size = i_size_read(inode);
-	stat->atime = inode->i_atime;
-	stat->mtime = inode->i_mtime;
-	stat->ctime = inode->i_ctime;
-	stat->blksize = (1 << inode->i_blkbits);
-	stat->blocks = inode->i_blocks;
+	stat->size = lower_stat->size;
+	stat->atime = lower_stat->atime;
+	stat->mtime = lower_stat->mtime;
+	stat->ctime = lower_stat->ctime;
+	stat->blksize = lower_stat->blksize;
+	stat->blocks = lower_stat->blocks;
 	data_put(top);
 	return 0;
 }
@@ -763,9 +789,13 @@ static int sdcardfs_getattr(struct vfsmount *mnt, struct dentry *dentry,
 		goto out;
 	sdcardfs_copy_and_fix_attrs(d_inode(dentry),
 			      d_inode(lower_path.dentry));
+<<<<<<< HEAD
         fsstack_copy_inode_size(d_inode(dentry), d_inode(lower_path.dentry));
 	err = sdcardfs_fillattr(mnt, d_inode(dentry), stat);
 	stat->blocks = lower_stat.blocks;
+=======
+	err = sdcardfs_fillattr(mnt, d_inode(dentry), &lower_stat, stat);
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 out:
 	sdcardfs_put_lower_path(dentry, &lower_path);
 	return err;

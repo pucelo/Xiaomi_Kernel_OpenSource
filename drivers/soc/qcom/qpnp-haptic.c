@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 /* Copyright (c) 2014-2015, 2017, The Linux Foundation. All rights reserved.
  * Copyright (C) 2018 XiaoMi, Inc.
+=======
+/* Copyright (c) 2014-2018, The Linux Foundation. All rights reserved.
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -2256,22 +2260,38 @@ static void qpnp_hap_td_enable(struct timed_output_dev *dev, int time_ms)
 {
 	struct qpnp_hap *hap = container_of(dev, struct qpnp_hap,
 					 timed_dev);
+<<<<<<< HEAD
 	int rc, vmax_mv;
+=======
+	bool state = !!time_ms;
+	ktime_t rem;
+	int rc;
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
 	if (time_ms < 0)
 		return;
 
 	mutex_lock(&hap->lock);
 
-	if (time_ms == 0) {
-		/* disable haptics */
-		hrtimer_cancel(&hap->hap_timer);
-		hap->state = 0;
-		schedule_work(&hap->work);
+	if (hap->state == state) {
+		if (state) {
+			rem = hrtimer_get_remaining(&hap->hap_timer);
+			if (time_ms > ktime_to_ms(rem)) {
+				time_ms = (time_ms > hap->timeout_ms ?
+						 hap->timeout_ms : time_ms);
+				hrtimer_cancel(&hap->hap_timer);
+				hap->play_time_ms = time_ms;
+				hrtimer_start(&hap->hap_timer,
+						ktime_set(time_ms / 1000,
+						(time_ms % 1000) * 1000000),
+						HRTIMER_MODE_REL);
+			}
+		}
 		mutex_unlock(&hap->lock);
 		return;
 	}
 
+<<<<<<< HEAD
 	if (time_ms < 10)
 		time_ms = 10;
 
@@ -2315,16 +2335,34 @@ static void qpnp_hap_td_enable(struct timed_output_dev *dev, int time_ms)
 #endif
 
 	hrtimer_cancel(&hap->hap_timer);
+=======
+	hap->state = state;
+	if (!hap->state) {
+		hrtimer_cancel(&hap->hap_timer);
+	} else {
+		if (time_ms < 10)
+			time_ms = 10;
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 
-	if (hap->auto_mode) {
-		rc = qpnp_hap_auto_mode_config(hap, time_ms);
-		if (rc < 0) {
-			pr_err("Unable to do auto mode config\n");
-			mutex_unlock(&hap->lock);
-			return;
+		if (hap->auto_mode) {
+			rc = qpnp_hap_auto_mode_config(hap, time_ms);
+			if (rc < 0) {
+				pr_err("Unable to do auto mode config\n");
+				mutex_unlock(&hap->lock);
+				return;
+			}
 		}
+
+		time_ms = (time_ms > hap->timeout_ms ?
+				 hap->timeout_ms : time_ms);
+		hap->play_time_ms = time_ms;
+		hrtimer_start(&hap->hap_timer,
+				ktime_set(time_ms / 1000,
+				(time_ms % 1000) * 1000000),
+				HRTIMER_MODE_REL);
 	}
 
+<<<<<<< HEAD
 	time_ms = (time_ms > hap->timeout_ms ? hap->timeout_ms : time_ms);
 	hap->play_time_ms = time_ms;
 	hap->state = 1;
@@ -2332,6 +2370,8 @@ static void qpnp_hap_td_enable(struct timed_output_dev *dev, int time_ms)
 	hrtimer_start(&hap->hap_timer,
 		ktime_set(time_ms / 1000, (time_ms % 1000) * 1000000),
 		HRTIMER_MODE_REL);
+=======
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 	mutex_unlock(&hap->lock);
 	schedule_work(&hap->work);
 }

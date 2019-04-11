@@ -184,7 +184,11 @@ EXPORT_SYMBOL(dump_vma);
 
 void dump_mm(const struct mm_struct *mm)
 {
+<<<<<<< HEAD
 	pr_emerg("mm %px mmap %px seqnum %llu task_size %lu\n"
+=======
+	pr_emerg("mm %p mmap %p seqnum %llu task_size %lu\n"
+>>>>>>> 478c8a6d4f83b512b88e478bed796228ddc78730
 #ifdef CONFIG_MMU
 		"get_unmapped_area %p\n"
 #endif
